@@ -16,3 +16,8 @@ Then the game is over
 When the game is over
 Then I can save my initials and my score
 
+## Screenshot
+![JavaScript Knowledge quiz](https://user-images.githubusercontent.com/90938940/141662326-6bfe52f4-2f71-4fe0-b0ab-374803762fc6.png)
+
+## Link
+https://oddtk.github.io/JavaScript-Knowledge-Quiz/
