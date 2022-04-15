@@ -1,5 +1,5 @@
 // Created an array for the quiz questions, choices, and correct answer
-let questions = [{
+const questions = [{
     title: "Inside which HTML element do we put the JavaScript?",
     choices: ["script", "scripting", "javascript", "js"],
     answer: "script"
@@ -32,77 +32,87 @@ let currentQuestion = -1;
 let timeLeft = 0;
 let timer;
 
-//starts the countdown timer once user clicks the 'start' button
+// start function
 function start() {
-
-    timeLeft = 75;
+    // time will start off at 100s
+    timeLeft = 100;
+    // we'll get the timeLeft id from index and set it to timeLeft
     document.getElementById("timeLeft").innerHTML = timeLeft;
-
+    // we'll create our timer function using setInterval for every second
     timer = setInterval(function() {
         timeLeft--;
         document.getElementById("timeLeft").innerHTML = timeLeft;
-//proceed to end the game function when timer is below 0 at any time
+        // if time left is less than zero clearInterval in timer and end game
         if (timeLeft <= 0) {
             clearInterval(timer);
             endGame();
         }
+        // delay set at 1000ms=1sec
     }, 1000);
-
+    // then next function will run
     next();
 }
 
-//stop the timer to end the game
+//end game function
 function endGame() {
+    // cancels timed, repeating action that was previously called by setInterval
     clearInterval(timer);
-
-    let quizContent = `
+    // following jsx will be rendered in the #quizBody set to quizContent
+    // finalscore out of 100 is displayed along
+    // input field create, user can then submit their name, and save their score
+    const quizContent = `
     <h2>Game over!</h2>
     <h3>You got ` + score +  `/100!</h3>
     <input type="text" id="name" placeholder="Your name!">
     <button onclick="setScore()">Set score!</button>`;
-
     document.getElementById("quizBody").innerHTML = quizContent;
 }
 
-// Stores scores on local storage
+// setScore function
 function setScore() {
+    // localStorage setItems with key value pairs
+    // highscore being the score
+    // highscoreName being the users input name
     localStorage.setItem("highscore", score);
     localStorage.setItem("highscoreName",  document.getElementById('name').value);
     getScore();
 }
-
-
+// getScore function
 function getScore() {
-    let quizContent = `
+    // when user clicks on High Score link they will be shown the following JSX
+    // it will get their previous score and inputted name
+    // they will have the option to clear their score or play again, restarting the game once more
+    const quizContent = `
     <h2>` + localStorage.getItem("highscoreName") + `'s highscore is:</h2>
     <h1>` + localStorage.getItem("highscore") + `</h1><br>
-
-    <button onclick="clearScore()">Clear score!</button><button onclick="resetGame()">Play Again!</button>
-
+    <button onclick="clearScore()">
+    Clear score!</button><button onclick="resetGame()">Play Again!
+    </button>
     `;
-
     document.getElementById("quizBody").innerHTML = quizContent;
 }
 
-//clears the score name and value in the local storage if the user selects 'clear score'
+//creates function to clear score, used in quizContent JSX above
 function clearScore() {
+    // clearScore will set the value pairs to empty strings
     localStorage.setItem("highscore", "");
     localStorage.setItem("highscoreName",  "");
-
     resetGame();
 }
 
 // This function will reset the quiz to its initial state
 function resetGame() {
+    // clearInterval function called
     clearInterval(timer);
+    // score is set to 0
     score = 0;
+    // current questions is set back to the first on in our array
     currentQuestion = -1;
     timeLeft = 0;
     timer = null;
-
     document.getElementById("timeLeft").innerHTML = timeLeft;
-
-    var quizContent = `
+    // resetGame will create JSX copy of our original HTML and display it when called
+    const quizContent = `
     <h1>
         JavaScript Quiz
     </h1>
@@ -110,44 +120,49 @@ function resetGame() {
         Click the button below to begin~
     </h3>
     <button onclick="start()">Let's Go!</button>`;
-
     document.getElementById("quizBody").innerHTML = quizContent;
 }
 
-// This function will deduct 15 seconds if the user chooses the incorrect answer
+// incorrect function will deduct 15 seconds if the user chooses the incorrect answer
 function incorrect() {
     timeLeft -= 15;
     next();
 }
 
-// This function will deduct 15 seconds if the user chooses the incorrect answer
+// correct function adds 20 points for every correct answer
 function correct() {
     score += 20;
     next();
 }
 
-// This function will loop through all questions
+// next function allows us to go onto the next question
 function next() {
     currentQuestion++;
-
+    // if currentQuestion is greater then the questions asked endGame function is ran
     if (currentQuestion > questions.length - 1) {
         endGame();
         return;
     }
-
-    var quizContent = "<h2>" + questions[currentQuestion].title + "</h2>"
-
-    for (var buttonLoop = 0; buttonLoop < questions[currentQuestion].choices.length; buttonLoop++) {
-        var buttonCode = "<button onclick=\"[ANS]\">[CHOICE]</button>";
+    // JSX for quiz content on #quizBody will take currentQuestion into title
+    let quizContent = "<h2>" + questions[currentQuestion].title + "</h2>"
+    // variable buttonLoop created in for loop which will repeat choices length
+    for (let buttonLoop = 0; buttonLoop < questions[currentQuestion].choices.length; buttonLoop++) {
+        // buttonCode is set to button JSX
+        let buttonCode = "<button onclick=\"[ANS]\">[CHOICE]</button>";
+        // buttonCode is set to [CHOICE] in our <button> being replaced with with our questions choices using our buttonLoop created above
         buttonCode = buttonCode.replace("[CHOICE]", questions[currentQuestion].choices[buttonLoop]);
+        // if the users choice is equal to our answer
+        // then [ANS] will be replaced with our correct() function adding 20 points to the final score
         if (questions[currentQuestion].choices[buttonLoop] == questions[currentQuestion].answer) {
             buttonCode = buttonCode.replace("[ANS]", "correct()");
         } else {
+            // otherwise if the users choice does not match the answer to its question
+            // then the incorrect() function will replace [ANS] deducting 15 seconds from the timer
             buttonCode = buttonCode.replace("[ANS]", "incorrect()");
         }
+        // buttonCode is evaluated first (it'll run and return its value), then its return value title is added to our h2
         quizContent += buttonCode
     }
-
-
+    // quiz content added to our #quizBody
     document.getElementById("quizBody").innerHTML = quizContent;
 }
