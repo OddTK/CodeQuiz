@@ -62,7 +62,7 @@ function endGame() {
     // input field create, user can then submit their name, and save their score
     const quizContent = `
     <h2>Game over!</h2>
-    <h3>You got ` + score +  `/100!</h3>
+    <h3>You got ${score}/100!</h3>
     <input type="text" id="name" placeholder="Your name!">
     <button onclick="setScore()">Set score!</button>`;
     document.getElementById("quizBody").innerHTML = quizContent;
@@ -79,18 +79,18 @@ function setScore() {
 }
 // getScore function
 function getScore() {
-    // when user clicks on High Score link they will be shown the following JSX
-    // it will get their previous score and inputted name
-    // they will have the option to clear their score or play again, restarting the game once more
+    const highscoreName = localStorage.getItem("highscoreName");
+    const highscore = localStorage.getItem("highscore");
+  
     const quizContent = `
-    <h2>` + localStorage.getItem("highscoreName") + `'s highscore is:</h2>
-    <h1>` + localStorage.getItem("highscore") + `</h1><br>
-    <button onclick="clearScore()">
-    Clear score!</button><button onclick="resetGame()">Play Again!
-    </button>
+      <h2>${highscoreName}'s highscore is:</h2>
+      <h1>${highscore}</h1><br>
+      <button onclick="clearScore()">Clear score!</button>
+      <button onclick="resetGame()">Play Again!</button>
     `;
+  
     document.getElementById("quizBody").innerHTML = quizContent;
-}
+  }
 
 //creates function to clear score, used in quizContent JSX above
 function clearScore() {
@@ -138,31 +138,17 @@ function correct() {
 // next function allows us to go onto the next question
 function next() {
     currentQuestion++;
-    // if currentQuestion is greater then the questions asked endGame function is ran
     if (currentQuestion > questions.length - 1) {
-        endGame();
-        return;
+      endGame();
+      return;
     }
-    // JSX for quiz content on #quizBody will take currentQuestion into title
-    let quizContent = "<h2>" + questions[currentQuestion].title + "</h2>"
-    // variable buttonLoop created in for loop which will repeat choices length
-    for (let buttonLoop = 0; buttonLoop < questions[currentQuestion].choices.length; buttonLoop++) {
-        // buttonCode is set to button JSX
-        let buttonCode = "<button onclick=\"[ANS]\">[CHOICE]</button>";
-        // buttonCode is set to [CHOICE] in our <button> being replaced with with our questions choices using our buttonLoop created above
-        buttonCode = buttonCode.replace("[CHOICE]", questions[currentQuestion].choices[buttonLoop]);
-        // if the users choice is equal to our answer
-        // then [ANS] will be replaced with our correct() function adding 20 points to the final score
-        if (questions[currentQuestion].choices[buttonLoop] == questions[currentQuestion].answer) {
-            buttonCode = buttonCode.replace("[ANS]", "correct()");
-        } else {
-            // otherwise if the users choice does not match the answer to its question
-            // then the incorrect() function will replace [ANS] deducting 15 seconds from the timer
-            buttonCode = buttonCode.replace("[ANS]", "incorrect()");
-        }
-        // buttonCode is evaluated first (it'll run and return its value), then its return value title is added to our h2
-        quizContent += buttonCode
-    }
-    // quiz content added to our #quizBody
+    const { title, choices, answer } = questions[currentQuestion];
+    const quizContent = `
+      <h2>${title}</h2>
+      ${choices.map((choice) => {
+        const isCorrect = choice === answer;
+        return `<button onclick="${isCorrect ? 'correct()' : 'incorrect()'}">${choice}</button>`;
+      }).join('')}
+    `;
     document.getElementById("quizBody").innerHTML = quizContent;
-}
+  }
